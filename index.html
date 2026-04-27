@@ -305,8 +305,31 @@
     <h1>瘦身追踪</h1>
     <p>2026年5月 · 健康计划</p>
   </div>
-  <div class="goal-pill">目标 52 kg</div>
+  <div style="display:flex;gap:8px;align-items:center;">
+    <div class="goal-pill" id="goal-pill-weight">目标 52 kg</div>
+    <div class="goal-pill" id="goal-pill-fat" style="background:var(--accent2);">体脂 28%</div>
+    <button onclick="openGoalEditor()" style="background:none;border:1px solid var(--border);border-radius:100px;padding:5px 12px;font-size:0.72rem;color:var(--ink2);cursor:pointer;">编辑目标</button>
+  </div>
 </header>
+
+<!-- Goal editor panel -->
+<div id="goal-editor" style="display:none;max-width:720px;margin:-1rem auto 1.25rem;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;">
+  <div class="card-label" style="margin-bottom:0.75rem;">调整目标</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:0.75rem;">
+    <div class="field">
+      <label>体重目标 (kg)</label>
+      <input type="number" id="edit-goal-weight" step="0.1" min="30" max="150">
+    </div>
+    <div class="field">
+      <label>体脂目标 (%)</label>
+      <input type="number" id="edit-goal-fat" step="0.1" min="5" max="60">
+    </div>
+  </div>
+  <div style="display:flex;gap:8px;">
+    <button onclick="saveGoals()" class="btn-save" style="flex:1;margin-top:0;">保存目标</button>
+    <button onclick="cancelGoals()" style="flex:0.4;padding:11px;background:none;border:1px solid var(--border);border-radius:9px;font-size:0.82rem;color:var(--ink2);cursor:pointer;">取消</button>
+  </div>
+</div>
 
 <div class="grid">
 
@@ -326,18 +349,28 @@
       </div>
       <div class="stat-item">
         <div class="stat-val" id="to-go">—<span>kg</span></div>
-        <div class="stat-label">距目标</div>
+        <div class="stat-label">距体重目标</div>
         <div class="stat-delta delta-neutral" id="days-label">—</div>
       </div>
     </div>
-    <div class="progress-wrap">
+    <div class="progress-wrap" style="margin-top:1rem;">
       <div class="progress-labels">
-        <span>起始 56.8kg</span>
+        <span>体重 起始 <span id="lbl-sw">56.8</span>kg</span>
         <span id="progress-pct">0%</span>
-        <span>目标 52kg</span>
+        <span>目标 <span id="lbl-gw">52</span>kg</span>
       </div>
       <div class="progress-bar">
         <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+      </div>
+    </div>
+    <div class="progress-wrap" style="margin-top:0.6rem;">
+      <div class="progress-labels">
+        <span>体脂 起始 <span id="lbl-sf">31.6</span>%</span>
+        <span id="fat-pct">0%</span>
+        <span>目标 <span id="lbl-gf">28</span>%</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="fat-fill" style="width:0%;background:var(--accent2)"></div>
       </div>
     </div>
   </div>
@@ -400,11 +433,39 @@
 
 <script>
 const START_WEIGHT = 56.8;
-const GOAL_WEIGHT = 52.0;
+const START_FAT = 31.6;
 
+let goals = JSON.parse(localStorage.getItem('slim-goals') || 'null') || { weight: 52.0, fat: 28.0 };
 let entries = JSON.parse(localStorage.getItem('slim-entries') || '[]');
 let currentTab = 'weight';
 let chart;
+let editingGoals = false;
+
+function openGoalEditor() {
+  if (editingGoals) return;
+  editingGoals = true;
+  const panel = document.getElementById('goal-editor');
+  document.getElementById('edit-goal-weight').value = goals.weight;
+  document.getElementById('edit-goal-fat').value = goals.fat;
+  panel.style.display = 'block';
+}
+
+function saveGoals() {
+  const w = parseFloat(document.getElementById('edit-goal-weight').value);
+  const f = parseFloat(document.getElementById('edit-goal-fat').value);
+  if (isNaN(w) || isNaN(f)) { showToast('请填写正确的目标数值'); return; }
+  goals = { weight: w, fat: f };
+  localStorage.setItem('slim-goals', JSON.stringify(goals));
+  document.getElementById('goal-editor').style.display = 'none';
+  editingGoals = false;
+  showToast('目标已更新 ✓');
+  render();
+}
+
+function cancelGoals() {
+  document.getElementById('goal-editor').style.display = 'none';
+  editingGoals = false;
+}
 
 function getTodayStr() {
   return new Date().toISOString().slice(0, 10);
@@ -462,6 +523,11 @@ function switchTab(tab, btn) {
 }
 
 function updateStats() {
+  document.getElementById('goal-pill-weight').textContent = '目标 ' + goals.weight + ' kg';
+  document.getElementById('goal-pill-fat').textContent = '体脂 ' + goals.fat + '%';
+  document.getElementById('lbl-gw').textContent = goals.weight;
+  document.getElementById('lbl-gf').textContent = goals.fat;
+
   if (entries.length === 0) return;
   const latest = entries[entries.length - 1];
   const first = entries[0];
@@ -480,13 +546,17 @@ function updateStats() {
     if (fDelta < 0) { fEl.textContent = '▼ ' + Math.abs(fDelta).toFixed(1) + '%'; fEl.className = 'stat-delta delta-down'; }
     else if (fDelta > 0) { fEl.textContent = '▲ ' + fDelta.toFixed(1) + '%'; fEl.className = 'stat-delta delta-up'; }
     else { fEl.textContent = '—'; fEl.className = 'stat-delta delta-neutral'; }
+
+    const fPct = Math.min(100, Math.max(0, ((START_FAT - latest.fat) / (START_FAT - goals.fat)) * 100));
+    document.getElementById('fat-fill').style.width = fPct.toFixed(1) + '%';
+    document.getElementById('fat-pct').textContent = fPct.toFixed(0) + '%';
   }
 
-  const toGo = Math.max(0, latest.weight - GOAL_WEIGHT);
+  const toGo = Math.max(0, latest.weight - goals.weight);
   document.getElementById('to-go').innerHTML = toGo.toFixed(1) + '<span>kg</span>';
   document.getElementById('days-label').textContent = entries.length + ' 天记录';
 
-  const pct = Math.min(100, Math.max(0, ((START_WEIGHT - latest.weight) / (START_WEIGHT - GOAL_WEIGHT)) * 100));
+  const pct = Math.min(100, Math.max(0, ((START_WEIGHT - latest.weight) / (START_WEIGHT - goals.weight)) * 100));
   document.getElementById('progress-fill').style.width = pct.toFixed(1) + '%';
   document.getElementById('progress-pct').textContent = pct.toFixed(0) + '%';
 }
@@ -504,25 +574,41 @@ function updateChart() {
   const pointRadii = entries.map(e => (e.exercise || e.note) ? 6 : 4);
   const pointBorders = entries.map(e => (e.exercise || e.note) ? 2 : 0);
 
+  const goalVal = currentTab === 'weight' ? goals.weight : goals.fat;
+  const goalColor = currentTab === 'weight' ? 'rgba(74,124,111,0.5)' : 'rgba(197,96,58,0.5)';
+
   if (chart) chart.destroy();
 
   chart = new Chart(document.getElementById('myChart'), {
     type: 'line',
     data: {
       labels,
-      datasets: [{
-        data,
-        borderColor: color,
-        backgroundColor: fillColor,
-        borderWidth: 2,
-        pointBackgroundColor: color,
-        pointBorderColor: '#fff',
-        pointBorderWidth: pointBorders,
-        pointRadius: pointRadii,
-        pointHoverRadius: 8,
-        fill: true,
-        tension: 0.35
-      }]
+      datasets: [
+        {
+          data,
+          borderColor: color,
+          backgroundColor: fillColor,
+          borderWidth: 2,
+          pointBackgroundColor: color,
+          pointBorderColor: '#fff',
+          pointBorderWidth: pointBorders,
+          pointRadius: pointRadii,
+          pointHoverRadius: 8,
+          fill: true,
+          tension: 0.35
+        },
+        {
+          data: labels.map(() => goalVal),
+          borderColor: goalColor,
+          borderWidth: 1.5,
+          borderDash: [5, 4],
+          pointRadius: 0,
+          pointHoverRadius: 0,
+          fill: false,
+          tension: 0,
+          label: '目标线'
+        }
+      ]
     },
     options: {
       responsive: true,
