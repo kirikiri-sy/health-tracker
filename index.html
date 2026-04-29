@@ -40,7 +40,8 @@
   .tab-btn { font-family: 'DM Sans', sans-serif; font-size: 0.75rem; font-weight: 500; padding: 5px 14px; border-radius: 100px; border: 1px solid var(--border); background: transparent; color: var(--ink2); cursor: pointer; transition: all 0.2s; }
   .tab-btn.active { background: var(--ink); color: white; border-color: var(--ink); }
   .chart-wrap { position: relative; height: 200px; }
-  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem; }
+  .form-row { display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 0.75rem; }
+  @media (min-width: 480px) { .form-row { display: grid; grid-template-columns: 1fr 1fr; } }
   .form-full { grid-column: 1 / -1; }
   .field label { display: block; font-size: 0.7rem; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink3); margin-bottom: 6px; }
   .field input, .field textarea { width: 100%; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; color: var(--ink); background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; outline: none; transition: border-color 0.2s; resize: none; }
@@ -306,14 +307,33 @@ function updateChart() {
 function updateLog() {
   const list = document.getElementById('log-list');
   if (!entries.length) { list.innerHTML = '<div class="empty-state">No entries yet — add your first one ✦</div>'; return; }
-  list.innerHTML = [...entries].reverse().map(e => `
-    <div class="log-row">
-      <span class="log-date">${formatDate(e.date)}</span>
-      <span class="log-weight">${e.weight.toFixed(1)} kg</span>
-      <span class="log-fat">${e.fat !== null ? e.fat.toFixed(1) + '%' : '—'}</span>
-      <span style="font-size:0.78rem;color:var(--ink3);white-space:normal;word-break:break-all;">${[e.exercise, e.note].filter(Boolean).join(' / ') || ''}</span>
+  list.innerHTML = [...entries].reverse().map((e, i) => {
+    const noteText = [e.exercise, e.note].filter(Boolean).join(' / ');
+    const isLong = noteText.length > 35;
+    const shortText = isLong ? noteText.slice(0, 35) + '…' : noteText;
+    const noteHtml = noteText ? `
+      <div style="grid-column:1/-1;padding:0 2px;">
+        <span id="note-short-${i}" style="font-size:0.75rem;color:var(--ink3);">${shortText}${isLong ? `<span onclick="toggleNote(${i})" style="color:var(--accent);cursor:pointer;margin-left:4px;font-size:0.7rem;">more</span>` : ''}</span>
+        ${isLong ? `<span id="note-full-${i}" style="display:none;font-size:0.75rem;color:var(--ink3);">${noteText}<span onclick="toggleNote(${i})" style="color:var(--accent);cursor:pointer;margin-left:4px;font-size:0.7rem;">less</span></span>` : ''}
+      </div>` : '';
+    return `
+    <div style="background:var(--bg);border-radius:10px;padding:10px 12px;display:grid;grid-template-columns:60px 80px 70px 1fr auto;align-items:center;gap:6px;font-size:0.82rem;">
+      <span style="color:var(--ink3);font-size:0.75rem;">${formatDate(e.date)}</span>
+      <span style="font-weight:500;">${e.weight.toFixed(1)} kg</span>
+      <span style="color:var(--ink2);">${e.fat !== null ? e.fat.toFixed(1) + '%' : '—'}</span>
+      <span></span>
       <button class="del-btn" onclick="deleteEntry('${e.date}')">×</button>
-    </div>`).join('');
+      ${noteHtml}
+    </div>`;
+  }).join('');
+}
+
+function toggleNote(i) {
+  const s = document.getElementById('note-short-' + i);
+  const f = document.getElementById('note-full-' + i);
+  if (!f) return;
+  if (f.style.display === 'none') { s.style.display = 'none'; f.style.display = 'inline'; }
+  else { s.style.display = 'inline'; f.style.display = 'none'; }
 }
 
 function exportCSV() {
