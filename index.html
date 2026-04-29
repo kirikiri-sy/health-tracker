@@ -302,13 +302,15 @@
 
 <header>
   <div class="logo-block">
-    <h1>瘦身追踪</h1>
-    <p>2026年健康计划</p>
+    <h1>Health<br>Tracker</h1>
+    <p>2026</p>
   </div>
-  <div style="display:flex;gap:8px;align-items:center;">
-    <div class="goal-pill" id="goal-pill-weight">目标 52 kg</div>
-    <div class="goal-pill" id="goal-pill-fat" style="background:var(--accent2);">体脂 28%</div>
-    <button onclick="openGoalEditor()" style="background:none;border:1px solid var(--border);border-radius:100px;padding:5px 12px;font-size:0.72rem;color:var(--ink2);cursor:pointer;">编辑目标</button>
+  <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;">
+    <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;">
+      <div class="goal-pill" id="goal-pill-weight" style="white-space:nowrap;">目标 52 kg</div>
+      <div class="goal-pill" id="goal-pill-fat" style="background:var(--accent2);white-space:nowrap;">体脂 28%</div>
+    </div>
+    <button onclick="openGoalEditor()" style="background:none;border:1px solid var(--border);border-radius:100px;padding:5px 12px;font-size:0.72rem;color:var(--ink2);cursor:pointer;white-space:nowrap;">编辑目标</button>
   </div>
 </header>
 
@@ -355,7 +357,7 @@
     </div>
     <div class="progress-wrap" style="margin-top:1rem;">
       <div class="progress-labels">
-        <span>体重 起始 <span id="lbl-sw">56.8</span>kg</span>
+        <span>体重 起始 <span id="lbl-sw">57</span>kg</span>
         <span id="progress-pct">0%</span>
         <span>目标 <span id="lbl-gw">52</span>kg</span>
       </div>
@@ -365,7 +367,7 @@
     </div>
     <div class="progress-wrap" style="margin-top:0.6rem;">
       <div class="progress-labels">
-        <span>体脂 起始 <span id="lbl-sf">31.6</span>%</span>
+        <span>体脂 起始 <span id="lbl-sf">32</span>%</span>
         <span id="fat-pct">0%</span>
         <span>目标 <span id="lbl-gf">28</span>%</span>
       </div>
@@ -421,7 +423,13 @@
 
   <!-- Log card -->
   <div class="card">
-    <div class="card-label">历史记录</div>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.9rem;">
+      <div class="card-label" style="margin-bottom:0;">历史记录</div>
+      <div style="display:flex; gap:6px;">
+        <button onclick="exportCSV()" style="font-size:0.72rem; padding:5px 12px; border-radius:100px; border:1px solid var(--border); background:none; color:var(--ink2); cursor:pointer;">导出 CSV</button>
+        <label style="font-size:0.72rem; padding:5px 12px; border-radius:100px; border:1px solid var(--border); background:none; color:var(--ink2); cursor:pointer;">导入 CSV<input type="file" accept=".csv" onchange="importCSV(event)" style="display:none;"></label>
+      </div>
+    </div>
     <div class="log-list" id="log-list">
       <div class="empty-state">还没有记录，添加第一条吧 ✦</div>
     </div>
@@ -432,8 +440,8 @@
 <div class="toast" id="toast"></div>
 
 <script>
-const START_WEIGHT = 56.8;
-const START_FAT = 31.6;
+const START_WEIGHT = 57.0;
+const START_FAT = 32.0;
 
 let goals = JSON.parse(localStorage.getItem('slim-goals') || 'null') || { weight: 52.0, fat: 28.0 };
 let entries = JSON.parse(localStorage.getItem('slim-entries') || '[]');
@@ -693,6 +701,59 @@ function updateLog() {
       <span class="log-note" style="white-space:normal; word-break:break-all;">${[e.exercise, e.note].filter(Boolean).join(' / ') || ''}</span>
       <button class="del-btn" onclick="deleteEntry('${e.date}')">×</button>
     </div>`).join('');
+}
+
+function exportCSV() {
+  if (entries.length === 0) { showToast('还没有数据可以导出'); return; }
+  const header = '日期,体重(kg),体脂(%),运动内容,饮食备注';
+  const rows = entries.map(e =>
+    `${e.date},${e.weight},${e.fat !== null ? e.fat : ''},${(e.exercise||'').replace(/,/g,'，')},${(e.note||'').replace(/,/g,'，')}`
+  );
+  const csv = [header, ...rows].join('\n');
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'health-tracker-' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('导出成功 ✓');
+}
+
+function importCSV(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const lines = e.target.result.replace(/^\uFEFF/, '').split('\n').filter(l => l.trim());
+      const imported = [];
+      for (let i = 1; i < lines.length; i++) {
+        const cols = lines[i].split(',');
+        if (cols.length < 2) continue;
+        const date = cols[0].trim();
+        const weight = parseFloat(cols[1]);
+        const fat = cols[2] ? parseFloat(cols[2]) : null;
+        const exercise = cols[3] ? cols[3].trim() : '';
+        const note = cols[4] ? cols[4].trim() : '';
+        if (date && !isNaN(weight)) imported.push({ date, weight, fat: isNaN(fat) ? null : fat, exercise, note });
+      }
+      if (imported.length === 0) { showToast('没有找到有效数据'); return; }
+      // Merge with existing, imported data takes priority
+      imported.forEach(imp => {
+        const idx = entries.findIndex(e => e.date === imp.date);
+        if (idx >= 0) entries[idx] = imp; else entries.push(imp);
+      });
+      entries.sort((a, b) => a.date.localeCompare(b.date));
+      localStorage.setItem('slim-entries', JSON.stringify(entries));
+      showToast('成功导入 ' + imported.length + ' 条记录 ✓');
+      render();
+    } catch(err) {
+      showToast('导入失败，请检查文件格式');
+    }
+  };
+  reader.readAsText(file, 'UTF-8');
+  event.target.value = '';
 }
 
 function render() {
