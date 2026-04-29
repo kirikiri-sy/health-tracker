@@ -1,301 +1,61 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>瘦身追踪</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Health Tracker">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='110' fill='%231A3C35'/%3E%3Ccircle cx='430' cy='100' r='145' fill='%232D6A5E' opacity='0.45'/%3E%3Ccircle cx='100' cy='445' r='120' fill='%234A9E8E' opacity='0.07'/%3E%3Cpolyline points='80,242 132,242 162,215 200,297 242,264 295,345 337,312 384,383 434,352' fill='none' stroke='%237ECFC0' stroke-width='28' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='80' cy='242' r='18' fill='%23FFFFFF' opacity='0.88'/%3E%3Ccircle cx='80' cy='242' r='7' fill='%231A3C35'/%3E%3Ccircle cx='434' cy='352' r='28' fill='%23E8845A' opacity='0.2'/%3E%3Ccircle cx='434' cy='352' r='17' fill='%23E8845A'/%3E%3Ccircle cx='434' cy='352' r='7' fill='%23FFFFFF'/%3E%3C/svg%3E">
+<title>Health Tracker</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
   :root {
-    --bg: #F7F5F0;
-    --card: #FFFFFF;
-    --ink: #1A1A18;
-    --ink2: #6B6B65;
-    --ink3: #AEADA6;
-    --accent: #4A7C6F;
-    --accent2: #C5603A;
-    --accent-light: #E8F0EE;
-    --border: #E8E6E0;
-    --radius: 16px;
+    --bg: #F7F5F0; --card: #FFFFFF; --ink: #1A1A18; --ink2: #6B6B65;
+    --ink3: #AEADA6; --accent: #4A7C6F; --accent2: #C5603A;
+    --border: #E8E6E0; --radius: 16px;
   }
-
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--bg);
-    color: var(--ink);
-    min-height: 100vh;
-    padding: 2rem 1.5rem 4rem;
-  }
-
-  header {
-    max-width: 720px;
-    margin: 0 auto 2.5rem;
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-  }
-
-  .logo-block h1 {
-    font-family: 'DM Serif Display', serif;
-    font-size: 2.2rem;
-    font-weight: 400;
-    color: var(--ink);
-    line-height: 1.1;
-  }
-
-  .logo-block p {
-    font-size: 0.8rem;
-    color: var(--ink3);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    margin-top: 4px;
-  }
-
-  .goal-pill {
-    background: var(--accent);
-    color: white;
-    font-size: 0.75rem;
-    font-weight: 500;
-    padding: 6px 14px;
-    border-radius: 100px;
-    letter-spacing: 0.04em;
-  }
-
-  .grid {
-    max-width: 720px;
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-    gap: 1.25rem;
-  }
-
-  .card {
-    background: var(--card);
-    border-radius: var(--radius);
-    border: 1px solid var(--border);
-    padding: 1.5rem;
-  }
-
-  .card-label {
-    font-size: 0.7rem;
-    font-weight: 500;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--ink3);
-    margin-bottom: 1rem;
-  }
-
-  /* Stats row */
-  .stats-row {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1rem;
-  }
-
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--ink); min-height: 100vh; padding: 2rem 1.5rem 4rem; }
+  header { max-width: 720px; margin: 0 auto 2.5rem; display: flex; align-items: flex-end; justify-content: space-between; }
+  .logo-block h1 { font-family: 'DM Serif Display', serif; font-size: 2.2rem; font-weight: 400; color: var(--ink); line-height: 1.1; }
+  .logo-block p { font-size: 0.8rem; color: var(--ink3); letter-spacing: 0.08em; text-transform: uppercase; margin-top: 4px; }
+  .goal-pill { background: var(--accent); color: white; font-size: 0.75rem; font-weight: 500; padding: 6px 14px; border-radius: 100px; letter-spacing: 0.04em; white-space: nowrap; }
+  .grid { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 1.25rem; }
+  .card { background: var(--card); border-radius: var(--radius); border: 1px solid var(--border); padding: 1.5rem; }
+  .card-label { font-size: 0.7rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink3); margin-bottom: 1rem; }
+  .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
   .stat-item { text-align: center; }
-
-  .stat-val {
-    font-family: 'DM Serif Display', serif;
-    font-size: 2rem;
-    font-weight: 400;
-    color: var(--ink);
-    line-height: 1;
-  }
-
-  .stat-val span {
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.85rem;
-    font-weight: 300;
-    color: var(--ink3);
-  }
-
-  .stat-label {
-    font-size: 0.72rem;
-    color: var(--ink3);
-    margin-top: 4px;
-  }
-
-  .stat-delta {
-    font-size: 0.72rem;
-    margin-top: 3px;
-    font-weight: 500;
-  }
-
-  .delta-down { color: var(--accent); }
-  .delta-up { color: var(--accent2); }
-  .delta-neutral { color: var(--ink3); }
-
-  /* Progress bar */
+  .stat-val { font-family: 'DM Serif Display', serif; font-size: 2rem; font-weight: 400; color: var(--ink); line-height: 1; }
+  .stat-val span { font-family: 'DM Sans', sans-serif; font-size: 0.85rem; font-weight: 300; color: var(--ink3); }
+  .stat-label { font-size: 0.72rem; color: var(--ink3); margin-top: 4px; }
+  .stat-delta { font-size: 0.72rem; margin-top: 3px; font-weight: 500; }
+  .delta-down { color: var(--accent); } .delta-up { color: var(--accent2); } .delta-neutral { color: var(--ink3); }
   .progress-wrap { margin-top: 0.75rem; }
-  .progress-labels {
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.72rem;
-    color: var(--ink3);
-    margin-bottom: 6px;
-  }
-  .progress-bar {
-    height: 6px;
-    background: var(--border);
-    border-radius: 100px;
-    overflow: hidden;
-  }
-  .progress-fill {
-    height: 100%;
-    background: var(--accent);
-    border-radius: 100px;
-    transition: width 0.6s ease;
-  }
-
-  /* Chart tabs */
-  .chart-tabs {
-    display: flex;
-    gap: 6px;
-    margin-bottom: 1.25rem;
-  }
-
-  .tab-btn {
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.75rem;
-    font-weight: 500;
-    padding: 5px 14px;
-    border-radius: 100px;
-    border: 1px solid var(--border);
-    background: transparent;
-    color: var(--ink2);
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-
-  .tab-btn.active {
-    background: var(--ink);
-    color: white;
-    border-color: var(--ink);
-  }
-
+  .progress-labels { display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--ink3); margin-bottom: 6px; }
+  .progress-bar { height: 6px; background: var(--border); border-radius: 100px; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--accent); border-radius: 100px; transition: width 0.6s ease; }
+  .chart-tabs { display: flex; gap: 6px; margin-bottom: 1.25rem; }
+  .tab-btn { font-family: 'DM Sans', sans-serif; font-size: 0.75rem; font-weight: 500; padding: 5px 14px; border-radius: 100px; border: 1px solid var(--border); background: transparent; color: var(--ink2); cursor: pointer; transition: all 0.2s; }
+  .tab-btn.active { background: var(--ink); color: white; border-color: var(--ink); }
   .chart-wrap { position: relative; height: 200px; }
-
-  /* Form */
-  .form-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.75rem;
-    margin-bottom: 0.75rem;
-  }
-
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem; }
   .form-full { grid-column: 1 / -1; }
-
-  .field label {
-    display: block;
-    font-size: 0.7rem;
-    font-weight: 500;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--ink3);
-    margin-bottom: 6px;
-  }
-
-  .field input, .field textarea {
-    width: 100%;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.9rem;
-    color: var(--ink);
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 10px 14px;
-    outline: none;
-    transition: border-color 0.2s;
-    resize: none;
-  }
-
-  .field input:focus, .field textarea:focus {
-    border-color: var(--accent);
-  }
-
-  .btn-save {
-    width: 100%;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.85rem;
-    font-weight: 500;
-    padding: 12px;
-    background: var(--accent);
-    color: white;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    letter-spacing: 0.04em;
-    transition: opacity 0.2s, transform 0.1s;
-    margin-top: 0.25rem;
-  }
-
-  .btn-save:hover { opacity: 0.88; }
-  .btn-save:active { transform: scale(0.98); }
-
-  /* Log */
+  .field label { display: block; font-size: 0.7rem; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink3); margin-bottom: 6px; }
+  .field input, .field textarea { width: 100%; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; color: var(--ink); background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; outline: none; transition: border-color 0.2s; resize: none; }
+  .field input:focus, .field textarea:focus { border-color: var(--accent); }
+  .btn-save { width: 100%; font-family: 'DM Sans', sans-serif; font-size: 0.85rem; font-weight: 500; padding: 12px; background: var(--accent); color: white; border: none; border-radius: 10px; cursor: pointer; letter-spacing: 0.04em; transition: opacity 0.2s, transform 0.1s; margin-top: 0.25rem; }
+  .btn-save:hover { opacity: 0.88; } .btn-save:active { transform: scale(0.98); }
   .log-list { display: flex; flex-direction: column; gap: 8px; max-height: 260px; overflow-y: auto; }
-
-  .log-row {
-    display: grid;
-    grid-template-columns: 80px 1fr 1fr auto;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 12px;
-    background: var(--bg);
-    border-radius: 10px;
-    font-size: 0.82rem;
-  }
-
+  .log-row { display: grid; grid-template-columns: 60px 80px 70px 1fr auto; align-items: start; gap: 8px; padding: 10px 12px; background: var(--bg); border-radius: 10px; font-size: 0.82rem; }
   .log-date { color: var(--ink3); font-size: 0.75rem; }
-  .log-weight { font-weight: 500; }
-  .log-fat { color: var(--ink2); }
-  .log-note { color: var(--ink3); font-size: 0.72rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-  .del-btn {
-    background: none;
-    border: none;
-    color: var(--ink3);
-    cursor: pointer;
-    font-size: 0.85rem;
-    padding: 2px 4px;
-    border-radius: 4px;
-    transition: color 0.2s;
-  }
+  .log-weight { font-weight: 500; } .log-fat { color: var(--ink2); }
+  .del-btn { background: none; border: none; color: var(--ink3); cursor: pointer; font-size: 0.85rem; padding: 2px 4px; border-radius: 4px; }
   .del-btn:hover { color: var(--accent2); }
-
-  .empty-state {
-    text-align: center;
-    color: var(--ink3);
-    font-size: 0.82rem;
-    padding: 1.5rem 0;
-    font-style: italic;
-  }
-
-  .toast {
-    position: fixed;
-    bottom: 2rem;
-    left: 50%;
-    transform: translateX(-50%) translateY(20px);
-    background: var(--ink);
-    color: white;
-    font-size: 0.8rem;
-    padding: 10px 20px;
-    border-radius: 100px;
-    opacity: 0;
-    transition: all 0.3s;
-    pointer-events: none;
-    z-index: 999;
-  }
+  .empty-state { text-align: center; color: var(--ink3); font-size: 0.82rem; padding: 1.5rem 0; font-style: italic; }
+  .toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--ink); color: white; font-size: 0.8rem; padding: 10px 20px; border-radius: 100px; opacity: 0; transition: all 0.3s; pointer-events: none; z-index: 999; }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-  .divider-line {
-    height: 1px;
-    background: var(--border);
-    margin: 1rem 0;
-  }
 </style>
 </head>
 <body>
@@ -307,131 +67,99 @@
   </div>
   <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;">
     <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;">
-      <div class="goal-pill" id="goal-pill-weight" style="white-space:nowrap;">目标 52 kg</div>
-      <div class="goal-pill" id="goal-pill-fat" style="background:var(--accent2);white-space:nowrap;">体脂 28%</div>
+      <div class="goal-pill" id="goal-pill-weight">Goal 52 kg</div>
+      <div class="goal-pill" id="goal-pill-fat" style="background:var(--accent2);">Body Fat 28%</div>
     </div>
-    <button onclick="openGoalEditor()" style="background:none;border:1px solid var(--border);border-radius:100px;padding:5px 12px;font-size:0.72rem;color:var(--ink2);cursor:pointer;white-space:nowrap;">编辑目标</button>
+    <button onclick="openGoalEditor()" style="background:none;border:1px solid var(--border);border-radius:100px;padding:5px 12px;font-size:0.72rem;color:var(--ink2);cursor:pointer;white-space:nowrap;">Edit Goals</button>
   </div>
 </header>
 
-<!-- Goal editor panel -->
 <div id="goal-editor" style="display:none;max-width:720px;margin:-1rem auto 1.25rem;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;">
-  <div class="card-label" style="margin-bottom:0.75rem;">调整目标</div>
+  <div class="card-label" style="margin-bottom:0.75rem;">Edit Goals</div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:0.75rem;">
-    <div class="field">
-      <label>体重目标 (kg)</label>
-      <input type="number" id="edit-goal-weight" step="0.1" min="30" max="150">
-    </div>
-    <div class="field">
-      <label>体脂目标 (%)</label>
-      <input type="number" id="edit-goal-fat" step="0.1" min="5" max="60">
-    </div>
+    <div class="field"><label>Weight Goal (kg)</label><input type="number" id="edit-goal-weight" step="0.1" min="30" max="150"></div>
+    <div class="field"><label>Body Fat Goal (%)</label><input type="number" id="edit-goal-fat" step="0.1" min="5" max="60"></div>
   </div>
   <div style="display:flex;gap:8px;">
-    <button onclick="saveGoals()" class="btn-save" style="flex:1;margin-top:0;">保存目标</button>
-    <button onclick="cancelGoals()" style="flex:0.4;padding:11px;background:none;border:1px solid var(--border);border-radius:9px;font-size:0.82rem;color:var(--ink2);cursor:pointer;">取消</button>
+    <button onclick="saveGoals()" class="btn-save" style="flex:1;margin-top:0;">Save Goals</button>
+    <button onclick="cancelGoals()" style="flex:0.4;padding:11px;background:none;border:1px solid var(--border);border-radius:9px;font-size:0.82rem;color:var(--ink2);cursor:pointer;">Cancel</button>
   </div>
 </div>
 
 <div class="grid">
 
-  <!-- Stats card -->
-  <div class="card" id="stats-card">
-    <div class="card-label">本月概览</div>
+  <div class="card">
+    <div class="card-label">Overview</div>
     <div class="stats-row">
       <div class="stat-item">
         <div class="stat-val" id="cur-weight">—<span>kg</span></div>
-        <div class="stat-label">当前体重</div>
+        <div class="stat-label">Current Weight</div>
         <div class="stat-delta delta-neutral" id="weight-delta">—</div>
       </div>
       <div class="stat-item">
         <div class="stat-val" id="cur-fat">—<span>%</span></div>
-        <div class="stat-label">当前体脂</div>
+        <div class="stat-label">Body Fat</div>
         <div class="stat-delta delta-neutral" id="fat-delta">—</div>
       </div>
       <div class="stat-item">
         <div class="stat-val" id="to-go">—<span>kg</span></div>
-        <div class="stat-label">距体重目标</div>
+        <div class="stat-label">To Goal</div>
         <div class="stat-delta delta-neutral" id="days-label">—</div>
       </div>
     </div>
     <div class="progress-wrap" style="margin-top:1rem;">
       <div class="progress-labels">
-        <span>体重 起始 <span id="lbl-sw">57</span>kg</span>
+        <span>Weight · Start <span id="lbl-sw">57</span> kg</span>
         <span id="progress-pct">0%</span>
-        <span>目标 <span id="lbl-gw">52</span>kg</span>
+        <span>Goal <span id="lbl-gw">52</span> kg</span>
       </div>
-      <div class="progress-bar">
-        <div class="progress-fill" id="progress-fill" style="width:0%"></div>
-      </div>
+      <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
     </div>
     <div class="progress-wrap" style="margin-top:0.6rem;">
       <div class="progress-labels">
-        <span>体脂 起始 <span id="lbl-sf">32</span>%</span>
+        <span>Body Fat · Start <span id="lbl-sf">32</span>%</span>
         <span id="fat-pct">0%</span>
-        <span>目标 <span id="lbl-gf">28</span>%</span>
+        <span>Goal <span id="lbl-gf">28</span>%</span>
       </div>
-      <div class="progress-bar">
-        <div class="progress-fill" id="fat-fill" style="width:0%;background:var(--accent2)"></div>
-      </div>
+      <div class="progress-bar"><div class="progress-fill" id="fat-fill" style="width:0%;background:var(--accent2)"></div></div>
     </div>
   </div>
 
-  <!-- Chart card -->
   <div class="card">
-    <div class="card-label">趋势图</div>
+    <div class="card-label">Trend</div>
     <div class="chart-tabs">
-      <button class="tab-btn active" onclick="switchTab('weight', this)">体重</button>
-      <button class="tab-btn" onclick="switchTab('fat', this)">体脂</button>
+      <button class="tab-btn active" onclick="switchTab('weight', this)">Weight</button>
+      <button class="tab-btn" onclick="switchTab('fat', this)">Body Fat</button>
     </div>
-    <div class="chart-wrap">
-      <canvas id="myChart"></canvas>
-    </div>
+    <div class="chart-wrap"><canvas id="myChart"></canvas></div>
   </div>
 
-  <!-- Input card -->
   <div class="card">
-    <div class="card-label">今日记录</div>
+    <div class="card-label">Today's Log</div>
     <div class="form-row">
-      <div class="field">
-        <label>日期</label>
-        <input type="date" id="inp-date">
-      </div>
-      <div class="field">
-        <label>体重 (kg)</label>
-        <input type="number" id="inp-weight" placeholder="56.8" step="0.1" min="30" max="150">
-      </div>
+      <div class="field"><label>Date</label><input type="date" id="inp-date"></div>
+      <div class="field"><label>Weight (kg)</label><input type="number" id="inp-weight" placeholder="57.0" step="0.1" min="30" max="150"></div>
     </div>
     <div class="form-row">
-      <div class="field">
-        <label>体脂 (%)</label>
-        <input type="number" id="inp-fat" placeholder="31.6" step="0.1" min="5" max="60">
-      </div>
-      <div class="field">
-        <label>运动内容</label>
-        <input type="text" id="inp-exercise" placeholder="散步30分钟">
-      </div>
+      <div class="field"><label>Body Fat (%)</label><input type="number" id="inp-fat" placeholder="32.0" step="0.1" min="5" max="60"></div>
+      <div class="field"><label>Exercise</label><input type="text" id="inp-exercise" placeholder="30 min walk"></div>
     </div>
     <div class="form-row">
-      <div class="field form-full">
-        <label>饮食备注</label>
-        <textarea id="inp-note" rows="2" placeholder="早: 燕麦+鸡蛋 / 午: 鸡胸+蔬菜 / 晚: 豆腐+沙拉"></textarea>
-      </div>
+      <div class="field form-full"><label>Meal Notes</label><textarea id="inp-note" rows="2" placeholder="B: oats + egg / L: chicken + veg / D: tofu + salad"></textarea></div>
     </div>
-    <button class="btn-save" onclick="saveEntry()">保存今日记录</button>
+    <button class="btn-save" onclick="saveEntry()">Save Today's Log</button>
   </div>
 
-  <!-- Log card -->
   <div class="card">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.9rem;">
-      <div class="card-label" style="margin-bottom:0;">历史记录</div>
-      <div style="display:flex; gap:6px;">
-        <button onclick="exportCSV()" style="font-size:0.72rem; padding:5px 12px; border-radius:100px; border:1px solid var(--border); background:none; color:var(--ink2); cursor:pointer;">导出 CSV</button>
-        <label style="font-size:0.72rem; padding:5px 12px; border-radius:100px; border:1px solid var(--border); background:none; color:var(--ink2); cursor:pointer;">导入 CSV<input type="file" accept=".csv" onchange="importCSV(event)" style="display:none;"></label>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.9rem;">
+      <div class="card-label" style="margin-bottom:0;">History</div>
+      <div style="display:flex;gap:6px;">
+        <button onclick="exportCSV()" style="font-size:0.72rem;padding:5px 12px;border-radius:100px;border:1px solid var(--border);background:none;color:var(--ink2);cursor:pointer;">Export CSV</button>
+        <label style="font-size:0.72rem;padding:5px 12px;border-radius:100px;border:1px solid var(--border);background:none;color:var(--ink2);cursor:pointer;">Import CSV<input type="file" accept=".csv" onchange="importCSV(event)" style="display:none;"></label>
       </div>
     </div>
     <div class="log-list" id="log-list">
-      <div class="empty-state">还没有记录，添加第一条吧 ✦</div>
+      <div class="empty-state">No entries yet — add your first one ✦</div>
     </div>
   </div>
 
@@ -452,44 +180,25 @@ let editingGoals = false;
 function openGoalEditor() {
   if (editingGoals) return;
   editingGoals = true;
-  const panel = document.getElementById('goal-editor');
   document.getElementById('edit-goal-weight').value = goals.weight;
   document.getElementById('edit-goal-fat').value = goals.fat;
-  panel.style.display = 'block';
+  document.getElementById('goal-editor').style.display = 'block';
 }
-
 function saveGoals() {
   const w = parseFloat(document.getElementById('edit-goal-weight').value);
   const f = parseFloat(document.getElementById('edit-goal-fat').value);
-  if (isNaN(w) || isNaN(f)) { showToast('请填写正确的目标数值'); return; }
+  if (isNaN(w) || isNaN(f)) { showToast('Please enter valid goal values'); return; }
   goals = { weight: w, fat: f };
   localStorage.setItem('slim-goals', JSON.stringify(goals));
   document.getElementById('goal-editor').style.display = 'none';
   editingGoals = false;
-  showToast('目标已更新 ✓');
+  showToast('Goals updated ✓');
   render();
 }
-
-function cancelGoals() {
-  document.getElementById('goal-editor').style.display = 'none';
-  editingGoals = false;
-}
-
-function getTodayStr() {
-  return new Date().toISOString().slice(0, 10);
-}
-
-function formatDate(str) {
-  const d = new Date(str + 'T00:00:00');
-  return (d.getMonth() + 1) + '/' + d.getDate();
-}
-
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2200);
-}
+function cancelGoals() { document.getElementById('goal-editor').style.display = 'none'; editingGoals = false; }
+function getTodayStr() { return new Date().toISOString().slice(0, 10); }
+function formatDate(str) { const d = new Date(str + 'T00:00:00'); return (d.getMonth()+1) + '/' + d.getDate(); }
+function showToast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2200); }
 
 function saveEntry() {
   const date = document.getElementById('inp-date').value;
@@ -497,73 +206,47 @@ function saveEntry() {
   const fat = parseFloat(document.getElementById('inp-fat').value);
   const exercise = document.getElementById('inp-exercise').value.trim();
   const note = document.getElementById('inp-note').value.trim();
-
-  if (!date || isNaN(weight)) { showToast('请填写日期和体重'); return; }
-
+  if (!date || isNaN(weight)) { showToast('Please enter date and weight'); return; }
   const existing = entries.findIndex(e => e.date === date);
   const entry = { date, weight, fat: isNaN(fat) ? null : fat, exercise, note };
-  if (existing >= 0) entries[existing] = entry;
-  else entries.push(entry);
-
+  if (existing >= 0) entries[existing] = entry; else entries.push(entry);
   entries.sort((a, b) => a.date.localeCompare(b.date));
   localStorage.setItem('slim-entries', JSON.stringify(entries));
-
   document.getElementById('inp-weight').value = '';
   document.getElementById('inp-fat').value = '';
   document.getElementById('inp-exercise').value = '';
   document.getElementById('inp-note').value = '';
-
-  showToast('记录已保存 ✓');
-  render();
+  showToast('Saved ✓'); render();
 }
 
-function deleteEntry(date) {
-  entries = entries.filter(e => e.date !== date);
-  localStorage.setItem('slim-entries', JSON.stringify(entries));
-  render();
-}
-
-function switchTab(tab, btn) {
-  currentTab = tab;
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  updateChart();
-}
+function deleteEntry(date) { entries = entries.filter(e => e.date !== date); localStorage.setItem('slim-entries', JSON.stringify(entries)); render(); }
+function switchTab(tab, btn) { currentTab = tab; document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); updateChart(); }
 
 function updateStats() {
-  document.getElementById('goal-pill-weight').textContent = '目标 ' + goals.weight + ' kg';
-  document.getElementById('goal-pill-fat').textContent = '体脂 ' + goals.fat + '%';
+  document.getElementById('goal-pill-weight').textContent = 'Goal ' + goals.weight + ' kg';
+  document.getElementById('goal-pill-fat').textContent = 'Body Fat ' + goals.fat + '%';
   document.getElementById('lbl-gw').textContent = goals.weight;
   document.getElementById('lbl-gf').textContent = goals.fat;
-
-  if (entries.length === 0) return;
-  const latest = entries[entries.length - 1];
-  const first = entries[0];
-
+  if (!entries.length) return;
+  const latest = entries[entries.length-1], first = entries[0];
   document.getElementById('cur-weight').innerHTML = latest.weight.toFixed(1) + '<span>kg</span>';
-  const wDelta = latest.weight - first.weight;
-  const wEl = document.getElementById('weight-delta');
+  const wDelta = latest.weight - first.weight, wEl = document.getElementById('weight-delta');
   if (wDelta < 0) { wEl.textContent = '▼ ' + Math.abs(wDelta).toFixed(1) + 'kg'; wEl.className = 'stat-delta delta-down'; }
   else if (wDelta > 0) { wEl.textContent = '▲ ' + wDelta.toFixed(1) + 'kg'; wEl.className = 'stat-delta delta-up'; }
   else { wEl.textContent = '—'; wEl.className = 'stat-delta delta-neutral'; }
-
   if (latest.fat !== null) {
     document.getElementById('cur-fat').innerHTML = latest.fat.toFixed(1) + '<span>%</span>';
-    const fDelta = entries.length > 1 ? latest.fat - first.fat : 0;
-    const fEl = document.getElementById('fat-delta');
+    const fDelta = entries.length > 1 ? latest.fat - first.fat : 0, fEl = document.getElementById('fat-delta');
     if (fDelta < 0) { fEl.textContent = '▼ ' + Math.abs(fDelta).toFixed(1) + '%'; fEl.className = 'stat-delta delta-down'; }
     else if (fDelta > 0) { fEl.textContent = '▲ ' + fDelta.toFixed(1) + '%'; fEl.className = 'stat-delta delta-up'; }
     else { fEl.textContent = '—'; fEl.className = 'stat-delta delta-neutral'; }
-
     const fPct = Math.min(100, Math.max(0, ((START_FAT - latest.fat) / (START_FAT - goals.fat)) * 100));
     document.getElementById('fat-fill').style.width = fPct.toFixed(1) + '%';
     document.getElementById('fat-pct').textContent = fPct.toFixed(0) + '%';
   }
-
   const toGo = Math.max(0, latest.weight - goals.weight);
   document.getElementById('to-go').innerHTML = toGo.toFixed(1) + '<span>kg</span>';
-  document.getElementById('days-label').textContent = entries.length + ' 天记录';
-
+  document.getElementById('days-label').textContent = entries.length + ' days logged';
   const pct = Math.min(100, Math.max(0, ((START_WEIGHT - latest.weight) / (START_WEIGHT - goals.weight)) * 100));
   document.getElementById('progress-fill').style.width = pct.toFixed(1) + '%';
   document.getElementById('progress-pct').textContent = pct.toFixed(0) + '%';
@@ -571,103 +254,42 @@ function updateStats() {
 
 function updateChart() {
   const labels = entries.map(e => formatDate(e.date));
-  const data = currentTab === 'weight'
-    ? entries.map(e => e.weight)
-    : entries.map(e => e.fat);
-
+  const data = currentTab === 'weight' ? entries.map(e => e.weight) : entries.map(e => e.fat);
   const color = currentTab === 'weight' ? '#4A7C6F' : '#C5603A';
   const fillColor = currentTab === 'weight' ? 'rgba(74,124,111,0.08)' : 'rgba(197,96,58,0.08)';
-
-  // Points with exercise/note get a larger highlighted dot
   const pointRadii = entries.map(e => (e.exercise || e.note) ? 6 : 4);
   const pointBorders = entries.map(e => (e.exercise || e.note) ? 2 : 0);
-
   const goalVal = currentTab === 'weight' ? goals.weight : goals.fat;
   const goalColor = currentTab === 'weight' ? 'rgba(74,124,111,0.5)' : 'rgba(197,96,58,0.5)';
-
   if (chart) chart.destroy();
-
   chart = new Chart(document.getElementById('myChart'), {
     type: 'line',
     data: {
       labels,
       datasets: [
-        {
-          data,
-          borderColor: color,
-          backgroundColor: fillColor,
-          borderWidth: 2,
-          pointBackgroundColor: color,
-          pointBorderColor: '#fff',
-          pointBorderWidth: pointBorders,
-          pointRadius: pointRadii,
-          pointHoverRadius: 8,
-          fill: true,
-          tension: 0.35
-        },
-        {
-          data: labels.map(() => goalVal),
-          borderColor: goalColor,
-          borderWidth: 1.5,
-          borderDash: [5, 4],
-          pointRadius: 0,
-          pointHoverRadius: 0,
-          fill: false,
-          tension: 0,
-          label: '目标线'
-        }
+        { data, borderColor: color, backgroundColor: fillColor, borderWidth: 2, pointBackgroundColor: color, pointBorderColor: '#fff', pointBorderWidth: pointBorders, pointRadius: pointRadii, pointHoverRadius: 8, fill: true, tension: 0.35 },
+        { data: labels.map(() => goalVal), borderColor: goalColor, borderWidth: 1.5, borderDash: [5,4], pointRadius: 0, pointHoverRadius: 0, fill: false, tension: 0, label: 'Goal' }
       ]
     },
     options: {
-      responsive: true,
-      maintainAspectRatio: false,
+      responsive: true, maintainAspectRatio: false,
       plugins: {
         legend: { display: false },
         tooltip: {
-          backgroundColor: '#1A1A18',
-          titleColor: '#AEADA6',
-          bodyColor: '#FFFFFF',
-          padding: 14,
-          cornerRadius: 10,
-          titleFont: { family: 'DM Sans', size: 11 },
-          bodyFont: { family: 'DM Sans', size: 12 },
-          boxWidth: 0,
-          boxHeight: 0,
+          backgroundColor: '#1A1A18', titleColor: '#AEADA6', bodyColor: '#FFFFFF',
+          padding: 14, cornerRadius: 10, boxWidth: 0, boxHeight: 0,
           callbacks: {
-            title: ctx => {
-              const e = entries[ctx[0].dataIndex];
-              return formatDate(e.date);
-            },
-            label: ctx => {
-              const e = entries[ctx.dataIndex];
-              const val = currentTab === 'weight'
-                ? '体重  ' + e.weight.toFixed(1) + ' kg'
-                : '体脂  ' + (e.fat !== null ? e.fat.toFixed(1) + ' %' : '—');
-              return val;
-            },
+            title: ctx => formatDate(entries[ctx[0].dataIndex].date),
+            label: ctx => { const e = entries[ctx.dataIndex]; return currentTab === 'weight' ? 'Weight  ' + e.weight.toFixed(1) + ' kg' : 'Body Fat  ' + (e.fat !== null ? e.fat.toFixed(1) + ' %' : '—'); },
             afterLabel: ctx => {
-              const e = entries[ctx.dataIndex];
-              const lines = [];
-              // wrap long text every 20 characters
+              const e = entries[ctx.dataIndex]; const lines = [];
               function wrapText(prefix, text) {
-                if (!text) return [];
-                const maxLen = 20;
-                const result = [];
-                let remaining = text;
-                let first = true;
-                while (remaining.length > 0) {
-                  if (first) {
-                    result.push(prefix + remaining.slice(0, maxLen));
-                    first = false;
-                  } else {
-                    result.push('      ' + remaining.slice(0, maxLen));
-                  }
-                  remaining = remaining.slice(maxLen);
-                }
+                if (!text) return []; const maxLen = 22; const result = []; let remaining = text; let first = true;
+                while (remaining.length > 0) { result.push(first ? prefix + remaining.slice(0, maxLen) : '      ' + remaining.slice(0, maxLen)); remaining = remaining.slice(maxLen); first = false; }
                 return result;
               }
-              if (e.exercise) lines.push(...wrapText('運動  ', e.exercise));
-              if (e.note) lines.push(...wrapText('饮食  ', e.note));
+              if (e.exercise) lines.push(...wrapText('Exercise  ', e.exercise));
+              if (e.note) lines.push(...wrapText('Meals  ', e.note));
               return lines;
             }
           }
@@ -675,12 +297,7 @@ function updateChart() {
       },
       scales: {
         x: { grid: { display: false }, ticks: { font: { family: 'DM Sans', size: 11 }, color: '#AEADA6' } },
-        y: {
-          grid: { color: '#F0EEE8', lineWidth: 1 },
-          ticks: { font: { family: 'DM Sans', size: 11 }, color: '#AEADA6',
-            callback: v => currentTab === 'weight' ? v.toFixed(1) + 'kg' : v.toFixed(1) + '%'
-          }
-        }
+        y: { grid: { color: '#F0EEE8', lineWidth: 1 }, ticks: { font: { family: 'DM Sans', size: 11 }, color: '#AEADA6', callback: v => currentTab === 'weight' ? v.toFixed(1) + 'kg' : v.toFixed(1) + '%' } }
       }
     }
   });
@@ -688,81 +305,55 @@ function updateChart() {
 
 function updateLog() {
   const list = document.getElementById('log-list');
-  if (entries.length === 0) {
-    list.innerHTML = '<div class="empty-state">还没有记录，添加第一条吧 ✦</div>';
-    return;
-  }
-  const sorted = [...entries].reverse();
-  list.innerHTML = sorted.map(e => `
-    <div class="log-row" style="grid-template-columns: 60px 80px 70px 1fr auto; align-items:start;">
+  if (!entries.length) { list.innerHTML = '<div class="empty-state">No entries yet — add your first one ✦</div>'; return; }
+  list.innerHTML = [...entries].reverse().map(e => `
+    <div class="log-row">
       <span class="log-date">${formatDate(e.date)}</span>
       <span class="log-weight">${e.weight.toFixed(1)} kg</span>
       <span class="log-fat">${e.fat !== null ? e.fat.toFixed(1) + '%' : '—'}</span>
-      <span class="log-note" style="white-space:normal; word-break:break-all;">${[e.exercise, e.note].filter(Boolean).join(' / ') || ''}</span>
+      <span style="font-size:0.78rem;color:var(--ink3);white-space:normal;word-break:break-all;">${[e.exercise, e.note].filter(Boolean).join(' / ') || ''}</span>
       <button class="del-btn" onclick="deleteEntry('${e.date}')">×</button>
     </div>`).join('');
 }
 
 function exportCSV() {
-  if (entries.length === 0) { showToast('还没有数据可以导出'); return; }
-  const header = '日期,体重(kg),体脂(%),运动内容,饮食备注';
-  const rows = entries.map(e =>
-    `${e.date},${e.weight},${e.fat !== null ? e.fat : ''},${(e.exercise||'').replace(/,/g,'，')},${(e.note||'').replace(/,/g,'，')}`
-  );
+  if (!entries.length) { showToast('No data to export'); return; }
+  const header = 'Date,Weight(kg),Body Fat(%),Exercise,Meal Notes';
+  const rows = entries.map(e => `${e.date},${e.weight},${e.fat !== null ? e.fat : ''},${(e.exercise||'').replace(/,/g,';')},${(e.note||'').replace(/,/g,';')}`);
   const csv = [header, ...rows].join('\n');
   const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
+  const a = document.createElement('a'); a.href = url;
   a.download = 'health-tracker-' + new Date().toISOString().slice(0,10) + '.csv';
-  a.click();
-  URL.revokeObjectURL(url);
-  showToast('导出成功 ✓');
+  a.click(); URL.revokeObjectURL(url);
+  showToast('Exported ✓');
 }
 
 function importCSV(event) {
-  const file = event.target.files[0];
-  if (!file) return;
+  const file = event.target.files[0]; if (!file) return;
   const reader = new FileReader();
   reader.onload = function(e) {
     try {
       const lines = e.target.result.replace(/^\uFEFF/, '').split('\n').filter(l => l.trim());
       const imported = [];
       for (let i = 1; i < lines.length; i++) {
-        const cols = lines[i].split(',');
-        if (cols.length < 2) continue;
-        const date = cols[0].trim();
-        const weight = parseFloat(cols[1]);
+        const cols = lines[i].split(','); if (cols.length < 2) continue;
+        const date = cols[0].trim(), weight = parseFloat(cols[1]);
         const fat = cols[2] ? parseFloat(cols[2]) : null;
-        const exercise = cols[3] ? cols[3].trim() : '';
-        const note = cols[4] ? cols[4].trim() : '';
+        const exercise = cols[3] ? cols[3].trim() : '', note = cols[4] ? cols[4].trim() : '';
         if (date && !isNaN(weight)) imported.push({ date, weight, fat: isNaN(fat) ? null : fat, exercise, note });
       }
-      if (imported.length === 0) { showToast('没有找到有效数据'); return; }
-      // Merge with existing, imported data takes priority
-      imported.forEach(imp => {
-        const idx = entries.findIndex(e => e.date === imp.date);
-        if (idx >= 0) entries[idx] = imp; else entries.push(imp);
-      });
+      if (!imported.length) { showToast('No valid data found'); return; }
+      imported.forEach(imp => { const idx = entries.findIndex(e => e.date === imp.date); if (idx >= 0) entries[idx] = imp; else entries.push(imp); });
       entries.sort((a, b) => a.date.localeCompare(b.date));
       localStorage.setItem('slim-entries', JSON.stringify(entries));
-      showToast('成功导入 ' + imported.length + ' 条记录 ✓');
-      render();
-    } catch(err) {
-      showToast('导入失败，请检查文件格式');
-    }
+      showToast('Imported ' + imported.length + ' entries ✓'); render();
+    } catch(err) { showToast('Import failed — please check file format'); }
   };
-  reader.readAsText(file, 'UTF-8');
-  event.target.value = '';
+  reader.readAsText(file, 'UTF-8'); event.target.value = '';
 }
 
-function render() {
-  updateStats();
-  updateChart();
-  updateLog();
-}
-
-// Init
+function render() { updateStats(); updateChart(); updateLog(); }
 document.getElementById('inp-date').value = getTodayStr();
 render();
 </script>
