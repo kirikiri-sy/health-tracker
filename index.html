@@ -619,10 +619,12 @@ function updateChart() {
           backgroundColor: '#1A1A18',
           titleColor: '#AEADA6',
           bodyColor: '#FFFFFF',
-          padding: 12,
+          padding: 14,
           cornerRadius: 10,
           titleFont: { family: 'DM Sans', size: 11 },
           bodyFont: { family: 'DM Sans', size: 12 },
+          boxWidth: 0,
+          boxHeight: 0,
           callbacks: {
             title: ctx => {
               const e = entries[ctx[0].dataIndex];
@@ -638,8 +640,26 @@ function updateChart() {
             afterLabel: ctx => {
               const e = entries[ctx.dataIndex];
               const lines = [];
-              if (e.exercise) lines.push('运动  ' + e.exercise);
-              if (e.note) lines.push('饮食  ' + e.note);
+              // wrap long text every 20 characters
+              function wrapText(prefix, text) {
+                if (!text) return [];
+                const maxLen = 20;
+                const result = [];
+                let remaining = text;
+                let first = true;
+                while (remaining.length > 0) {
+                  if (first) {
+                    result.push(prefix + remaining.slice(0, maxLen));
+                    first = false;
+                  } else {
+                    result.push('      ' + remaining.slice(0, maxLen));
+                  }
+                  remaining = remaining.slice(maxLen);
+                }
+                return result;
+              }
+              if (e.exercise) lines.push(...wrapText('運動  ', e.exercise));
+              if (e.note) lines.push(...wrapText('饮食  ', e.note));
               return lines;
             }
           }
@@ -666,14 +686,13 @@ function updateLog() {
   }
   const sorted = [...entries].reverse();
   list.innerHTML = sorted.map(e => `
-    <div class="log-row">
+    <div class="log-row" style="grid-template-columns: 60px 80px 70px 1fr auto; align-items:start;">
       <span class="log-date">${formatDate(e.date)}</span>
       <span class="log-weight">${e.weight.toFixed(1)} kg</span>
       <span class="log-fat">${e.fat !== null ? e.fat.toFixed(1) + '%' : '—'}</span>
-      <span class="log-note">${e.exercise || e.note || ''}</span>
+      <span class="log-note" style="white-space:normal; word-break:break-all;">${[e.exercise, e.note].filter(Boolean).join(' / ') || ''}</span>
       <button class="del-btn" onclick="deleteEntry('${e.date}')">×</button>
-    </div>
-  `).join('');
+    </div>`).join('');
 }
 
 function render() {
